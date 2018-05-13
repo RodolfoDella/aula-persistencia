@@ -97,4 +97,7 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_main2">Main2Activity</string>
 
+    <string name="menu_open_shared">Abrir Preferências</string>
+    <string name="menu_read_shared">Ler Preferências</string>
+
 </resources>

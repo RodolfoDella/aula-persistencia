@@ -1,0 +1,16 @@
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/m_open_prefs"
+        android:orderInCategory="100"
+        android:title="@string/menu_open_shared"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/m_read_prefs"
+        android:orderInCategory="100"
+        android:title="@string/menu_read_shared"
+        app:showAsAction="never" />
+
+</menu>

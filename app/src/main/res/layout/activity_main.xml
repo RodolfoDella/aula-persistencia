@@ -52,23 +52,5 @@
         android:text="@null"
         android:id="@+id/txtTexto"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:text="Abrir Preferências"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:onClick="abrirPreferencias"/>
-        <Button
-            android:text="Ler Preferências"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:onClick="lerPreferencias"/>
-    </LinearLayout>
-
 </LinearLayout>
 

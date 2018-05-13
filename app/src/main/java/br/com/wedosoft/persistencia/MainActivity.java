@@ -12,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -26,35 +28,96 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-public class MainActivity extends AppCompatActivity
-        implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
     EditText edtTexto;
     TextView txtTexto;
     RadioGroup rgTipo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         edtTexto = (EditText) findViewById(R.id.edtTexto);
         txtTexto = (TextView) findViewById(R.id.txtTexto);
         rgTipo = (RadioGroup) findViewById(R.id.rgTipo);
+
         findViewById(R.id.btnSave).setOnClickListener(this);
         findViewById(R.id.btnLer).setOnClickListener(this);
 
         rgTipo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                edtTexto.setText("");
                 txtTexto.setText("");
             }
         });
+
+        /*
+        SharedPreferences prefs = getSharedPreferences("configuracoes", MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("aula", "Preferências de Usuário");
+        editor.putBoolean("ativo", true);
+        editor.commit();
+
+        String aula = prefs.getString("aula", null);
+        boolean ativo = prefs.getBoolean("ativo", true);
+
+        Log.i("Rodolfo", aula);
+        Log.i("Rodolfo", String.valueOf(ativo));
+        */
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.m_open_prefs:
+                abrirPreferencias();
+                return true;
+            case R.id.m_read_prefs:
+                lerPreferencias();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    public void abrirPreferencias(){
+        startActivity(new Intent(this, ConfigActivity.class));
+    }
+
+    public void lerPreferencias(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String cidade = prefs.getString(getString(R.string.pref_cidade),getString(R.string.pref_cidade_default));
+
+        String redeSocial = prefs.getString(getString(R.string.pref_rede_social),getString(R.string.pref_rede_social_default));
+        boolean mensagens = prefs.getBoolean(getString(R.string.pref_mensagens), false);
+
+        String msg = String.format("%s = %s\n%s = %s\n%s = %s",getString(R.string.titulo_cidade), cidade,getString(R.string.titulo_rede_social), redeSocial,getString(R.string.titulo_mensagens), String.valueOf(mensagens));
+
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+
     @Override
     public void onClick(View view) {
+        int tipo = rgTipo.getCheckedRadioButtonId();
         boolean ler = false;
+
         if (view.getId() == R.id.btnLer) {
             ler = true;
         }
-        int tipo = rgTipo.getCheckedRadioButtonId();
+
         if (ler) {
             switch (tipo) {
                 case R.id.rbInterno:
@@ -100,12 +163,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void salvarNoSdCard(boolean privado) {
-        boolean temPermissao = checarPermissao(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                PERMISSAO_SDCARD);
+        boolean temPermissao = checarPermissao(Manifest.permission.WRITE_EXTERNAL_STORAGE,PERMISSAO_SDCARD);
         if (!temPermissao) {
             return;
         }
+
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             File meuDir = getExternalDir(privado);
@@ -128,8 +190,8 @@ public class MainActivity extends AppCompatActivity
     }
     private void carregarDoSdCard(boolean privado) {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+
+        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             File meuDir = getExternalDir(privado);
             if (meuDir.exists()) {
                 File arquivoTxt = new File(meuDir, "arquivo.txt");
@@ -159,28 +221,29 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void salvar(FileOutputStream fos) throws IOException {
-        String[] linhas = TextUtils.split(
-                edtTexto.getText().toString(), "\n");
+        String[] linhas = TextUtils.split(edtTexto.getText().toString(), "\n");
         PrintWriter writter = new PrintWriter(fos);
+
         for (String linha : linhas) {
             writter.println(linha);
         }
+
         writter.flush();
         writter.close();
         fos.close();
 
-        Toast.makeText(this,  "Valor persistido com sucesso!",
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,  "Valor persistido com sucesso!", Toast.LENGTH_SHORT).show();
     }
     private void carregar(FileInputStream fis) throws IOException {
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(fis));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         StringBuilder sb = new StringBuilder();
         String linha;
+
         while ((linha = reader.readLine()) != null) {
             if (sb.length() != 0) sb.append('\n');
             sb.append(linha);
         }
+
         reader.close();
         fis.close();
         txtTexto.setText(sb.toString());
@@ -210,30 +273,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-    }
-
-    public void abrirPreferencias(View v){
-        startActivity(new Intent(this, ConfigActivity.class));
-    }
-
-    public void lerPreferencias(View v){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String cidade = prefs.getString(
-                getString(R.string.pref_cidade),
-                getString(R.string.pref_cidade_default));
-
-        String redeSocial = prefs.getString(
-                getString(R.string.pref_rede_social),
-                getString(R.string.pref_rede_social_default));
-        boolean mensagens = prefs.getBoolean(
-                getString(R.string.pref_mensagens), false);
-
-        String msg = String.format("%s = %s\n%s = %s\n%s = %s",
-                getString(R.string.titulo_cidade), cidade,
-                getString(R.string.titulo_rede_social), redeSocial,
-                getString(R.string.titulo_mensagens), String.valueOf(mensagens));
-
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
 }

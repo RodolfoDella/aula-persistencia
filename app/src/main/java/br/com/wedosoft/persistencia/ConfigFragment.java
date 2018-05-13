@@ -18,31 +18,30 @@ public class ConfigFragment extends PreferenceFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferencias);
-        mPrefCidade = (EditTextPreference)
-                findPreference(getString(R.string.pref_cidade));
-        mPrefRedeSocial = (ListPreference)
-                findPreference(getString(R.string.pref_rede_social));
+
+        mPrefCidade = (EditTextPreference) findPreference(getString(R.string.pref_cidade));
+        mPrefRedeSocial = (ListPreference) findPreference(getString(R.string.pref_rede_social));
+
         preencherSumario(mPrefCidade);
         preencherSumario(mPrefRedeSocial);
     }
 
     private void preencherSumario(Preference preference){
         preference.setOnPreferenceChangeListener(this);
-        SharedPreferences pref =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Object value = pref.getString(preference.getKey(), "");
         onPreferenceChange(preference, value);
     }
 
     @Override
     public boolean onPreferenceChange(
-            Preference preference, Object newValue) {
+        Preference preference, Object newValue) {
         String stringValue = newValue.toString();
+
         if (preference.equals(mPrefRedeSocial)){
             int index = mPrefRedeSocial.findIndexOfValue(stringValue);
             if (index >= 0){
-                mPrefRedeSocial.setSummary(
-                        mPrefRedeSocial.getEntries()[index]);
+                mPrefRedeSocial.setSummary(mPrefRedeSocial.getEntries()[index]);
             }
         } else if (preference.equals(mPrefCidade)){
             mPrefCidade.setSummary(stringValue);
